@@ -3,7 +3,7 @@
  * CPSC-25
  * Assignment: TicTacToe with Trees
  */
-
+//Description in the README.md file.
 #include <iostream>
 #include <vector>
 #include <limits>
@@ -84,13 +84,13 @@ public:
 
         if (isMaximizing) { //this has to be a boolean value since it is a minimax function.
             int bestScore = numeric_limits<int>::min();
-            for (int move : state.getAvailableMoves()) { //getting the game state and the available moves. the vector has all the available moves.
+            for(int move : state.getAvailableMoves()) { //getting the game state and the available moves. the vector has all the available moves.
                 GameState newState = state.makeMove(move, COMPUTER);
                 int score = minimax(newState, false); //this is the recursive call to the minimax function. it's going to throw it back to the recursive call.// then, it will check the base case. 
                 bestScore = max(bestScore, score); 
             }
             return bestScore;
-        } else { //if we are not maximizing, then we are minimizing.
+        }else{ //if we are not maximizing, then we are minimizing.
             int bestScore = numeric_limits<int>::max();
             for (int move : state.getAvailableMoves()) {
                 GameState newState = state.makeMove(move, HUMAN); //this is maximizing for the human.
@@ -103,11 +103,10 @@ public:
 
     int findBestMove(const GameState& state) {
         int bestScore = numeric_limits<int>::min();
-        int bestMove = -1;
-        int moveNumber = 1; // Track the move number
+        int bestMove = -1; // Track the move number
+        int moveNumber = 1; 
     
         cout << "AI Decision Process:\n";
-    
         for (int move : state.getAvailableMoves()) {
             GameState newState = state.makeMove(move, COMPUTER);
             int score = minimax(newState, false);
@@ -141,8 +140,9 @@ void playGame() {//start playGame()
     char playFirst;
     char currentPlayer;
     //currentPlayer = HUMAN; //Old code setting the current player to human.
+    //Removed to allow the user to pick who goes first.
 
-    //Play again variables (5 lines)
+    //Play again as well as while !gameOver.
     bool gameOver = false;
     char playAgain;
     int aiWin = 0;
@@ -200,7 +200,7 @@ void playGame() {//start playGame()
             state = GameState(); //reset the game state.
             currentPlayer = HUMAN; //reset the current player.
             gameOver = false; //reset the game over condition.
-        } else {
+        }else{
             cout<<"AI Wins: " << aiWin << " Player Wins: " << playerWin << " Draw: " << draw << endl; //Added the total winnings.
             cout << "Thanks for playing!\n";
             gameOver = true;
