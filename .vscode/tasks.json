@@ -9,7 +9,8 @@
                 "-g",
                 "main.cpp",
                 "-o",
-                "main"
+                "main",
+                //"GameState.cpp",
             ],
             "group": {
                 "kind": "build",

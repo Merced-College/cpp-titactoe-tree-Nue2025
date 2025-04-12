@@ -1,3 +1,9 @@
+/* Nue Lopez
+ * 4/17/2025
+ * CPSC-25
+ * Assignment: TicTacToe with Trees
+ */
+
 #include <iostream>
 #include <vector>
 #include <limits>
@@ -53,14 +59,14 @@ public:
     vector<int> getAvailableMoves() const {
         vector<int> moves;
         for (int i = 0; i < 9; ++i)
-            if (board[i] == EMPTY) moves.push_back(i);
+            if (board[i] == EMPTY) moves.push_back(i); //checks to see if the board is empty, and then pushes it into a vector.
         return moves;
     }
 
-    GameState makeMove(int index, char player) const {
-        vector<char> newBoard = board;
-        newBoard[index] = player;
-        return GameState(newBoard);
+    GameState makeMove(int index, char player) const { //returns it to a game state object. takes the index and the player move.
+        vector<char> newBoard = board; //creates vector based off the old board.
+        newBoard[index] = player; 
+        return GameState(newBoard); //returs the game state object.
     }
 
     const vector<char>& getBoard() const {
@@ -71,23 +77,23 @@ public:
 class TicTacToeTree {
 public:
     int minimax(const GameState& state, bool isMaximizing) {
-        char winner = state.checkWinner();
-        if (winner == COMPUTER) return 1;
-        if (winner == HUMAN) return -1;
-        if (state.isFull()) return 0;
+        char winner = state.checkWinner();  
+        if (winner == COMPUTER) return 1;   //the next three are base case scenarios. if the checkWinner function comes back with the winner,
+        if (winner == HUMAN) return -1;    //then if the winner is the computer, it returns 1. if the winner is the human,
+        if (state.isFull()) return 0;//it returns -1. if the board is full, it returns 0.
 
-        if (isMaximizing) {
+        if (isMaximizing) { //this has to be a boolean value since it is a minimax function.
             int bestScore = numeric_limits<int>::min();
-            for (int move : state.getAvailableMoves()) {
+            for (int move : state.getAvailableMoves()) { //getting the game state and the available moves. the vector has all the available moves.
                 GameState newState = state.makeMove(move, COMPUTER);
-                int score = minimax(newState, false);
-                bestScore = max(bestScore, score);
+                int score = minimax(newState, false); //this is the recursive call to the minimax function. it's going to throw it back to the recursive call.// then, it will check the base case. 
+                bestScore = max(bestScore, score); 
             }
             return bestScore;
-        } else {
+        } else { //if we are not maximizing, then we are minimizing.
             int bestScore = numeric_limits<int>::max();
             for (int move : state.getAvailableMoves()) {
-                GameState newState = state.makeMove(move, HUMAN);
+                GameState newState = state.makeMove(move, HUMAN); //this is maximizing for the human.
                 int score = minimax(newState, true);
                 bestScore = min(bestScore, score);
             }
@@ -98,52 +104,111 @@ public:
     int findBestMove(const GameState& state) {
         int bestScore = numeric_limits<int>::min();
         int bestMove = -1;
-
+        int moveNumber = 1; // Track the move number
+    
+        cout << "AI Decision Process:\n";
+    
         for (int move : state.getAvailableMoves()) {
             GameState newState = state.makeMove(move, COMPUTER);
             int score = minimax(newState, false);
+    
+            // Print the move number, move position, and score
+            if (score == -1){
+                cout << "Move " << moveNumber << ": Position " << move << ", Score: bad spot (" << score << ")" << endl;
+
+            }else{
+                cout << "Move " << moveNumber << ": Position " << move << ", Score: good spot (" << score << ")" << endl;
+            }
+
             if (score > bestScore) {
                 bestScore = score;
                 bestMove = move;
             }
+            moveNumber++; // Increment the move number
         }
+    
+        cout << "AI chooses position " << bestMove;
+        cout<<" with score " << bestScore << endl;
         return bestMove;
     }
 };
 
-void playGame() {
-    GameState state;
-    TicTacToeTree ai;
-    char currentPlayer = HUMAN;
+void playGame() {//start playGame()
+    GameState state; //creates a game state object.
+    TicTacToeTree ai; 
 
-    while (!state.isGameOver()) {
-        state.printBoard();
-        if (currentPlayer == HUMAN) {
-            int move;
-            cout << "Enter your move (0-8): ";
-            cin >> move;
-            if (move >= 0 && move < 9 && state.getBoard()[move] == EMPTY) {
-                state = state.makeMove(move, HUMAN);
-                currentPlayer = COMPUTER;
-            } else {
-                cout << "Invalid move. Try again.\n";
-            }
-        } else {
-            int move = ai.findBestMove(state);
-            state = state.makeMove(move, COMPUTER);
-            cout << "Computer plays at position " << move << endl;
+    //Try to use a random class to pick who goes first...
+    char playFirst;
+    char currentPlayer;
+    //currentPlayer = HUMAN; //Old code setting the current player to human.
+
+    //Play again variables (5 lines)
+    bool gameOver = false;
+    char playAgain;
+    int aiWin = 0;
+    int playerWin = 0;
+    int draw = 0;
+
+    while (!gameOver){
+        cout <<"Who is playing first? c for computer, h for human: ";
+        cin >> playFirst;
+        if (playFirst == 'c' || playFirst == 'C'){
+            currentPlayer = COMPUTER;
+        }
+        else{
             currentPlayer = HUMAN;
         }
-    }
+        while (!state.isGameOver()) { //keeps the game going while it is NOT over.
+            state.printBoard();
+            if (currentPlayer == HUMAN) {
+                int move;
+                cout << "Enter your move (0-8): ";
+                cin >> move;
+                if (move >= 0 && move < 9 && state.getBoard()[move] == EMPTY) {
+                    state = state.makeMove(move, HUMAN);
+                    currentPlayer = COMPUTER;
+                } else {
+                    cout << "Invalid move. Try again.\n";
+                }
+            } else {
+                int move = ai.findBestMove(state);
+                state = state.makeMove(move, COMPUTER);
+                cout << "Computer plays at position " << move << endl;
+                currentPlayer = HUMAN;
+            }
+        }
+    
+        state.printBoard();
+        char winner = state.checkWinner();
+        if (winner == COMPUTER){
+            cout << "Computer wins!\n";
+            aiWin++; //Added total winnings code here.
+        }
+        else if (winner == HUMAN){
+            cout << "You win!\n";
+            playerWin++; //Added total winnings code here.
+        }
+        else {
+            cout << "It's a draw!\n";
+            draw++; //Added total winnings code here.
+        }
 
-    state.printBoard();
-    char winner = state.checkWinner();
-    if (winner == COMPUTER) cout << "Computer wins!\n";
-    else if (winner == HUMAN) cout << "You win!\n";
-    else cout << "It's a draw!\n";
-}
+        //Play again (added)
+        cout<<"Play again? (y/n) ";
+        cin >> playAgain;
+        if (playAgain == 'y' || playAgain == 'Y') {
+            state = GameState(); //reset the game state.
+            currentPlayer = HUMAN; //reset the current player.
+            gameOver = false; //reset the game over condition.
+        } else {
+            cout<<"AI Wins: " << aiWin << " Player Wins: " << playerWin << " Draw: " << draw << endl; //Added the total winnings.
+            cout << "Thanks for playing!\n";
+            gameOver = true;
+        }
+    }
+}//end playGame()
 
 int main() {
-    playGame();
-    return 0;
+    playGame(); //If you want to debug, you can use the debugger by-
+    return 0; //-adding a breakpoint, and this will go through the code step by step through the debugger.
 }
